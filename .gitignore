@@ -1,0 +1,39 @@
+﻿# Виртуальное окружение
+.venv/
+venv/
+env/
+ENV/
+
+# Данные и результаты
+data/
+models/
+logs/
+results_graphs/
+*.parquet
+*.csv
+!requirements.txt
+
+# Секреты
+.env
+*.key
+*.pem
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
