@@ -1,39 +1,23 @@
-# .github/workflows/signal_checker.yml
 name: Periodic Signal Check
 
 on:
-  # Запуск каждый час (в 0 минут)
   schedule:
-    - cron: '0 * * * *'
-  # Позволяет запустить проверку вручную из вкладки Actions
+    - cron: "0 * * * *"
   workflow_dispatch:
 
 jobs:
   check_signals:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
         with:
-          python-version: '3.11'
-
+          python-version: "3.11"
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-
-      # Этот шаг нужен, чтобы получить свежие данные и модели
-      - name: Fetch data and prepare features
-        run: |
-          python fetch_data.py
-          python prepare_features.py
-        env:
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }} # Не используется, но на всякий случай
-
-      - name: Check for signals and notify
+      - name: Check signals and notify
         run: python signal_checker.py
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
