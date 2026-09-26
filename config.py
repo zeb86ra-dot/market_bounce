@@ -1,76 +1,51 @@
-"""
-config.py — v7: только шорты, RR=1.5, скоринг убран из фичей
-"""
+﻿import os
 
-import os
-
-# === Пути ===
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+DATA_LIVE = os.path.join(PROJECT_ROOT, "data", "live")
 DATA_RAW = os.path.join(PROJECT_ROOT, "data", "raw")
 DATA_PROCESSED = os.path.join(PROJECT_ROOT, "data", "processed")
 DATA_RESULTS = os.path.join(PROJECT_ROOT, "data", "results")
+MODELS_DIR = os.path.join(PROJECT_ROOT, "models")
+GRAPHS_DIR = os.path.join(PROJECT_ROOT, "results_graphs")
+LOG_DIR = os.path.join(PROJECT_ROOT, "logs")
 
-for d in [DATA_RAW, DATA_PROCESSED, DATA_RESULTS]:
-    os.makedirs(d, exist_ok=True)
-
-# === Тикеры MOEX ===
 TICKERS = [
     "GAZP", "LKOH", "NVTK", "ROSN", "TATN", "GMKN", "NLMK", "ALRS",
     "PLZL", "CHMF", "SBER", "VTBR", "MGNT", "YDEX",
+    "AFKS", "IRAO", "SNGS", "SMLT", "RUAL", "POLY", "FIVE", "LSRG",
+    "AFLT", "PIKK", "MOEX", "CBOM",
+    "MAGN", "RASP", "NMTP", "UNAC", "KMAZ", "MSNG", "OGKB", "TGKA",
 ]
 
-# === Данные ===
-FETCH_DAYS = 730
+HORIZON = 5
+MAX_HOLD_DAYS = 5
 
-# === Индикаторы ===
-ATR_PERIOD = 14
-MA_FAST = 50
-MA_SLOW = 200
+MA_PERIOD = 20
+MA_LONG = 50
 RSI_PERIOD = 14
-VOL_LOOKBACK = 20
 BB_PERIOD = 20
 BB_STD = 2
+VOL_PERCENTILE = 75
 
-# === Уровни ===
-LEVEL_TOL = 0.01
-SWING_LOOKBACK = 20
-USE_BB_LEVELS = False
-USE_SWING_LEVELS = True
-USE_MA_LEVELS = False
+RSI_OVERSOLD = 30
+RSI_OVERBOUGHT = 70
+NEAR_LEVEL_THRESHOLD = 0.01
+STOP_LOSS = 0.05
+TAKE_PROFIT = 0.08
 
-# === Bounce-скоринг ===
-SCORE_WEIGHTS = {
-    "score_close":        0.30,
-    "score_volume":       0.15,
-    "score_confirm":      0.10,
-    "score_penetration":  0.10,
-    "score_trend":        0.05,
-    "score_tests":        0.20,
-    "score_rsi":          0.10,
-}
+TRAIN_WINDOW = 120
+TEST_WINDOW = 21
+STEP = 21
 
-# === Стоп / Тейк / Трейлинг ===
-ATR_MULT_STOP = 2.0
-RR_RATIO = 1.5
-TRAIL_AFTER_RR = 0.7
-TRAIL_ATR_MULT = 1.5
-TX_COST = 0.001
-MAX_HOLDING_DAYS = 10
+PROBA_LONG = 0.65
+PROBA_SHORT = 0.40
+MAX_POSITIONS = 7
+USE_REL_TARGET = False
+COMMISSION = 0.001
 
-# === Направления ===
-DIRECTIONS = ["short"]
-
-# === Трендовый фильтр ===
-USE_TREND_FILTER = True
-
-# === Walk-Forward ===
-WF_N_SPLITS = 5
-CONFIDENCE_THRESHOLD = 0.55
-
-# === XGBoost ===
 XGB_PARAMS = {
-    "n_estimators": 80,
-    "max_depth": 3,
+    "n_estimators": 200,
+    "max_depth": 4,
     "learning_rate": 0.05,
     "subsample": 0.8,
     "colsample_bytree": 0.8,
@@ -82,13 +57,21 @@ XGB_PARAMS = {
     "use_label_encoder": False,
 }
 
-# === Признаки ===
-# Скоринг убран — он обратно коррелирует с PnL (Spearman = -0.108, p=0.042)
-FEATURES_WITH_SCORE = [
-    "rsi_14", "vol_ratio", "atr_14",
-    "ma_50", "ma_200", "close_to_ma50",
+FEATURE_COLS = [
+    "ma_ratio", "ma_trend", "price_above_ma",
+    "rsi", "rsi_oversold", "rsi_overbought",
+    "macd", "macd_signal", "macd_hist",
+    "bb_width", "bb_pctb", "dist_to_lower_bb", "dist_to_upper_bb", "bb_squeeze",
+    "ret_1d", "ret_5d", "ret_10d", "momentum",
+    "drawdown", "max_dd_20d",
+    "vol_ratio", "vol_decline", "vol_trend",
+    "vol_20d", "vol_skew", "high_low_range",
+    "near_support", "near_resistance", "pullback_depth",
+    "bounce_long_signal", "bounce_short_signal",
+    "dist_to_5d_low", "dist_to_5d_high",
+    "breadth", "sector_rank",
+    "pullback_uptrend", "close_position", "gap", "close_to_ma20", "rsi_ma",
+    "body_ratio",
 ]
 
-FEATURES_WITHOUT_SCORE = ["rsi_14", "vol_ratio", "atr_14", "ma_50", "ma_200", "close_to_ma50"]
-
-MIN_TRADES = 30
+FETCH_DAYS = 730
